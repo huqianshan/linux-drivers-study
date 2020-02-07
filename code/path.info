@@ -1,0 +1,5 @@
+                "${workspaceFolder}/**",
+                "/lib/modules/4.15.0-52-generic/**",
+                "/lib/modules/4.15.0-52-generic/build/arch/x86/include/",
+                "/lib/modules/4.15.0-52-generic/build/include/",
+                "/lib/modules/4.15.0-52-generic//build/arch/x86/include/generated/"

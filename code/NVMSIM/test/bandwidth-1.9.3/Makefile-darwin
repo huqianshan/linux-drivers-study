@@ -1,0 +1,49 @@
+#============================================================================
+# bandwidth, a benchmark to estimate memory transfer bandwidth.
+# Copyright (C) 2005-2019 by Zack T Smith.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# The author may be reached at veritas@comcast.net.
+#============================================================================
+
+CFLAGS= -g -Wno-conditional-type-mismatch
+CC=gcc -Wall -I.
+SRC=main.c timing.c
+OBJ=main.o timing.o
+LIB= 
+AS=nasm
+ARM_AS=as
+ARM_CC=gcc
+
+# Note: Mac 32-bit no longer supported by Mac OS.
+
+bandwidth64: CPUCharacteristics.c Testing.c ${SRC} routines-x86-64bit.asm OOC64
+	${AS} -f macho64 utility-x86-64bit.asm -o utility-x86-64bit.o
+	${AS} -f macho64 routines-x86-64bit.asm -o routines-x86-64bit.o
+	${CC} -m64 ${CFLAGS} -c -I ./OOC Testing.c
+	${CC} -m64 ${CFLAGS} -c -I ./OOC CPUCharacteristics.c
+	${CC} -m64 ${CFLAGS} ${SRC} CPUCharacteristics.o Testing.o utility-x86-64bit.o routines-x86-64bit.o ${OOCLIB64} -lm -o bandwidth64
+
+bandwidth32: CPUCharacteristics.c Testing.c ${SRC} routines-x86-32bit.asm OOC32
+	@echo =========================================================
+	@echo NOTE: Compiling for 32-bit OS/X only works on older OSes.
+	@echo =========================================================
+	${AS} -f macho32 utility-x86-32bit.asm -o utility-x86-32bit.o
+	${AS} -f macho32 routines-x86-32bit.asm -o routines-x86-32bit.o
+	${CC} -m32 ${CFLAGS} -c -I ./OOC Testing.c
+	${CC} -m32 ${CFLAGS} -c -I ./OOC CPUCharacteristics.c
+	${CC} -m32 ${CFLAGS} ${SRC} CPUCharacteristics.o Testing.o utility-x86-32bit.o routines-x86-32bit.o ${OOCLIB32} -lm -o bandwidth32
+

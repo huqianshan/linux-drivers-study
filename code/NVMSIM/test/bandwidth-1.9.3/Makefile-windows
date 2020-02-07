@@ -1,0 +1,44 @@
+#============================================================================
+# bandwidth, a benchmark to estimate memory transfer bandwidth.
+# Copyright (C) 2005-2019 by Zack T Smith.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+# The author may be reached at veritas@comcast.net.
+#============================================================================
+
+CFLAGS= -g -Wno-conditional-type-mismatch 
+CC=gcc -Wall -I.
+SRC=main.c timing.c
+OBJ=main.o timing.o
+LIB= 
+AS=nasm
+ARM_AS=as
+ARM_CC=gcc
+
+bandwidth64: CPUCharacteristics.c Testing.c ${SRC} routines-x86-64bit.asm OOC64
+	${AS} -f win64 routines-x86-64bit.asm -o routines-x86-64bit.o
+	${AS} -f win64 utility-x86-64bit.asm -o utility-x86-64bit.o
+	${CC} -D__WIN64__ -m64 ${CFLAGS} -c -I ./OOC Testing.c
+	${CC} -D__WIN64__ -m64 ${CFLAGS} -c -I ./OOC CPUCharacteristics.c
+	${CC} ${CFLAGS} -D__WIN64__ -DWINVER=0x0600 -m64 -lm ${SRC} CPUCharacteristics.o Testing.o routines-x86-64bit.o utility-x86-64bit.o ${OOCLIB64} -o bandwidth64
+
+bandwidth32: CPUCharacteristics.c Testing.c ${SRC} routines-x86-32bit.asm OOC32
+	${AS} -f win32 routines-x86-32bit.asm -o routines-x86-32bit.o
+	${AS} -f win32 utility-x86-32bit.asm -o utility-x86-32bit.o
+	${CC} -D__WIN32__ -m32 ${CFLAGS} -c -I ./OOC Testing.c
+	${CC} -D__WIN32__ -m32 ${CFLAGS} -c -I ./OOC CPUCharacteristics.c
+	${CC} ${CFLAGS} -D__WIN32__ -DWINVER=0x0600 -m32 -lm ${SRC} CPUCharacteristics.o Testing.o routines-x86-32bit.o ${OOCLIB32} -o bandwidth32
+
