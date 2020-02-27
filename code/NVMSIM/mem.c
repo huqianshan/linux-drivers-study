@@ -14,7 +14,7 @@
 
 
 /**
- * Copy a memory buffer
+ * Copy a memory buffer now
  */
 void memory_copy(void* dest, const void* buffer, size_t size)
 {
